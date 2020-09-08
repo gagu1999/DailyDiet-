@@ -1,6 +1,11 @@
 #ifndef FOOD_H
 #define FOOD_H
 
+#include <iostream>
+#include <vector>
+#include <cstring>
+using namespace std;
+
 class Food
 {
   private:
@@ -13,7 +18,9 @@ class Food
   public:
     Food(char * name, int kcal, int carbo, int protein, int fat)
     {
-      this -> name = name; 
+      
+      this -> name = new char[strlen(name) + 1];
+      strcpy(this -> name, name); 
       this -> kcal = kcal; 
       this -> carbohydrate = carbo;
       this -> protein = protein; 
@@ -22,9 +29,12 @@ class Food
     
     void showInfo()
     {
-      printf("음식이름 : %s\n", name);
-      printf("칼로리 : %d, 탄수화물 : %d, 단백질 : %d, 지방 : %d\n", kcal, carbohydrate, protein, fat);
+      printf("음식이름: %s\n", name);
+      printf("칼로리: %dkcal, 탄수화물: %dg, 단백질: %dg, 지방: %dg\n", kcal, carbohydrate, protein, fat);
     }
 };
 
-#endif FOOD_H
+void insertNewFood(vector<Food *> & vec);
+void showDailyDietInfo(vector<Food *> & vec);
+void showMenu();
+#endif // FOOD_H
