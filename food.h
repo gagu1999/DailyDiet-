@@ -74,5 +74,5 @@ class Food
 void insertNewFood(vector<Food *> & vec); // 
 void showDailyDietInfo(vector<Food *> & vec); // 하루동안 먹은 식단을 불러주는 함수.
 void showMenu(); // 프로그램의 작동메뉴를 보여주는 함수.
-void choseeFood(vector<Food *> & vec); // DB에서 음식을 고르는 함수.
+void choseeFood(vector<Food *> & vec, vector<Food * > & storage); // DB에서 음식을 고르는 함수.
 #endif // FOOD_H

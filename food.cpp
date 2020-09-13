@@ -42,6 +42,7 @@ void insertNewFood(vector<Food *> & vec)
 void showDailyDietInfo(vector<Food *> & vec)
 {
   int kcal, carbo, protein, fat;
+  kcal = carbo = protein = fat = 0;
   for(int i = 0; i < vec.size(); i++)
   {
     printf("%d번째로 먹은 음식입니다.\n", i+1);
@@ -56,68 +57,69 @@ void showDailyDietInfo(vector<Food *> & vec)
   printf("칼로리:%d kcal, 탄수화물:%d g, 단백질:%d g, 지방:%d g\n", kcal, carbo, protein, fat);
 }
 
-void choseeFood(vector<Food *> & vec)
+void choseeFood(vector<Food *> & vec, vector<Food * > & storage)
 {
   int idx = 1;
   ifstream readFile;
   readFile.open("dataBase.txt");
-  if(readFile.is_open())
+  if(readFile.is_open() && storage.size() == 0) // 맨처음 불러와서 storage가 비어있는 경우
   {
     while(!readFile.eof())
     {
-      string str;
-      getline(readFile, str);
-      cout << idx << "번 음식: " << str <<"\n";
+      string name;
+      string tmp;
+      int kcal, carbo, protein, fat;
+      getline(readFile, name);
+      if(readFile.eof())
+      {
+        break;
+      }
+      cout << idx << "번 음식: " << name <<"\n";
       idx++;
-      getline(readFile, str);
-      getline(readFile, str);
-      getline(readFile, str);
-      getline(readFile, str);
+      getline(readFile, tmp);
+      kcal = stoi(tmp);
+      getline(readFile, tmp);
+      carbo = stoi(tmp);
+      getline(readFile, tmp);
+      protein = stoi(tmp);
+      getline(readFile, tmp);
+      fat = stoi(tmp);
+      Food * food = new Food(name, kcal, carbo, protein,fat);
+      storage.push_back(food);
+    }
+  } else // 이전에 storage를 채워놓은 경우
+  {
+    for(int i = 0; i < storage.size(); i++)
+    {
+      cout << (i + 1) << "번 음식: " << storage[i]->getName() << "\n";
     }
   }
   readFile.close();
-  cout << "음식번호를 입력해주세요: \n";
-  cout <<"원하시는 음식이 없다면 0을 입력해주세요:";
+  cout << "음식번호를 입력해주세요\n";
+  cout <<"원하시는 음식이 없다면 0을 입력해주세요\n";
+  cout << "번호 입력: ";
   cin >> idx;
+
+  while(idx < 0 || storage.size() < idx)
+  {
+    cout << "잘못된 입력입니다. 다시 입력해주세요\n";
+    cout << "번호 입력: ";
+    cin >> idx;
+  }
   if(idx == 0)
   {
     return insertNewFood(vec);
   } else 
   {
-    readFile.open("dataBase.txt");
-    if(readFile.is_open())
-    {
-      string str;
-      for(int i = 1; i < idx; i++)
-      {
-        for(int j = 1; j <= 5; j++)
-        {
-          getline(readFile, str);
-        }
-      }
-    }
-    string name;
-    string tmp;
-    int kcal, carbo, protein, fat;
-    getline(readFile, name);
-    getline(readFile, tmp);
-    kcal = stoi(tmp);
-    getline(readFile, tmp);
-    carbo = stoi(tmp);
-    getline(readFile, tmp);
-    protein = stoi(tmp);
-    getline(readFile, tmp);
-    fat = stoi(tmp);
-    Food * food = new Food(name, kcal, carbo, protein,fat);
-    vec.push_back(food);
-    readFile.close();
+    vec.push_back(storage[idx - 1]); // 위에서 구한idx로 출력하면 되지롱
   }
 }
 
 
 void showMenu()
 {
-  vector<Food*> container;
+  vector<Food*> today; //오늘 먹은 음식을 담을 벡터
+  vector<Food*> storage; // 이전에 먹었던 음식들을 담아놓은 벡터
   while(1)
   {
     int n;
@@ -129,13 +131,20 @@ void showMenu()
     cout << "번호를 입력해주세요: \n";
     cout << "------------------------------------------------------------\n";
     cin >> n;
+    while(n < 1 || n > 4)
+    {
+      cout << "잘못된 입력입니다. 다시 입력해주세요\n";
+      cout << "번호 입력: ";
+      cin >> n;
+    }
+
     switch(n)
     {
       case 1:
       {
         cout << "------------------------------------------------------------\n";
         cout << "오늘 먹은 음식을 추가합니다.\n";
-        insertNewFood(container);
+        insertNewFood(today);
         cout << "------------------------------------------------------------\n";
         break;
       }
@@ -143,7 +152,7 @@ void showMenu()
       {
         cout << "------------------------------------------------------------\n";
         cout << "오늘 하루동안 먹은 모든 음식을 출력합니다.\n";
-        showDailyDietInfo(container);
+        showDailyDietInfo(today);
         cout << "------------------------------------------------------------\n";
         break;
       }
@@ -151,7 +160,7 @@ void showMenu()
       {
         cout << "------------------------------------------------------------\n";
         cout << "데이터베이스에서 음식을 선택합니다.\n";
-        choseeFood(container);
+        choseeFood(today, storage);
         cout << "------------------------------------------------------------\n";
         break;
       }
